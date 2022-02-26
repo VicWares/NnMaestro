@@ -2,7 +2,7 @@ package nnmaestro20;
 
 /**
  * ***************************************************************
- * NNmaestro21 January 5, 2012 Rev 21
+ * NNmaestro20 Version220225
  * No changes from 20.4
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011 
  * All rights reserved 
@@ -25,8 +25,8 @@ public class Controller
     private BufferedReader bufferedReader;
     private int[][] inputArray;
     private BufferedReader input;
-    private String version = "21";
-    private File file = new File("/Users/wts3/NetBeansProjects/NNmaestro201/NNmaestro20/src/nnmaestro20/XOR.csv");
+    private String version = "220225";
+    private File file = new File("/Users/vicwintriss/IdeaProjects/NNmaestro20/src/nnmaestro20/CharRecog.csv");
     public View view;
     private Timer paintTicker;
     private int numberOfInputPEs;//Set automatically by reading first line of input file
@@ -74,7 +74,6 @@ public class Controller
         view.setInputArray(inputArray);
         view.setOutputs(outputs);
         paintTicker = new Timer(500, view);//Sets painter refresh rate
-
         view.setInputPElist(inputPElist);
         view.setHiddenPElist(hiddenPElist);
         view.setOutputPElist(outputPElist);
@@ -91,7 +90,6 @@ public class Controller
          ***********************************************/
         while (true)
         {
-//            Thread.yield();
             double lastRMSErr = 0.0;
             for (int i = 0; i < inputFileLength; i++)
             {
@@ -200,18 +198,21 @@ public class Controller
         }
     }
 
-    public void initializeHiddenPEs()
+    public int initializeHiddenPEs()
     {
+        int hiddenPEnumber = 0;
         for (int i = 0; i < numberOfHiddenPEs; i++)//Add hidden PEs and hidden circles and create input value list space and add initial weights
         {
+            hiddenPEnumber = i + 1;
             hiddenPElist.add(new PE());
             PE thisHiddenPE = hiddenPElist.get(i);
             for (int j = 0; j < numberOfInputPEs + 1; j++)//+1 to account for bias input
             {
                 thisHiddenPE.getInputValueList().add(1.0);//Make space in hidden PE input value list...1.0 for bias input
-                thisHiddenPE.getWeightList().add((Math.random() * 2) - 1);//Initialize weights
+                thisHiddenPE.getWeightList().add((Math.random() * 2) - 1);//Initialize random weights
             }
         }
+        return hiddenPEnumber;
     }
 
     public void initializeOutputPEs()
@@ -291,7 +292,7 @@ public class Controller
         for (int i = 0; i < numberOfHiddenPEs; i++)
         {
             PE thisHiddenPE = hiddenPElist.get(i);
-            thisHiddenPE.processInputs();
+            double output = thisHiddenPE.processInputs();
         }
     }
 

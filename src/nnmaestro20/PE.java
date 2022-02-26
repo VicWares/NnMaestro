@@ -1,4 +1,12 @@
 package nnmaestro20;
+/**
+ * ***************************************************************
+ * NNmaestro20 Version220225
+ * No changes from 20.4
+ * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
+ * All rights reserved
+ *************************************************************************
+ */
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +20,7 @@ public class PE implements Serializable
     private double outputError;
     private double hErrSum;
     private double weightedInput;
+    private int peNumber;
 
     public PE()
     {
@@ -19,7 +28,7 @@ public class PE implements Serializable
         inputValueList = new ArrayList<Double>();
     }
 
-    public void processInputs()
+    public double processInputs()
     {
         weightedInput = 0;
         for (int i = 0; i < inputValueList.size(); i++)
@@ -27,6 +36,7 @@ public class PE implements Serializable
             weightedInput += (inputValueList.get(i) * weightValueList.get(i));
         }
         outputValue = sigmoid(weightedInput);
+        return outputValue;
     }
 
     private double sigmoid(double input)
@@ -66,10 +76,7 @@ public class PE implements Serializable
         inputValueList.add(inputValue);
     }
 
-    public ArrayList<Double> getInputValueList()
-    {
-        return inputValueList;
-    }
+    public ArrayList<Double> getInputValueList() {return inputValueList;}
 
     public void setDesiredTrainingOutputValue(double desiredTrainingOutputValue)
     {
@@ -109,5 +116,9 @@ public class PE implements Serializable
     public ArrayList<Double> getWeightValueList()
     {
         return weightValueList;
+    }
+    public int getPeNumber()
+    {
+        return peNumber;
     }
 }
