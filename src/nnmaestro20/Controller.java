@@ -1,8 +1,7 @@
 package nnmaestro20;
-
 /**
  * ***************************************************************
- * NNmaestro20 Version220225
+ * NNmaestro20 Version220226
  * No changes from 20.4
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011 
  * All rights reserved 
@@ -13,20 +12,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
-
 public class Controller
 {
+    private String version = "220226";
     private int inputFileLength;//Set automatically by reading length of input file
     private int inputLineLength;
     private FileReader fileReader;
     private BufferedReader bufferedReader;
     private int[][] inputArray;
     private BufferedReader input;
-    private String version = "220225";
-    private File file = new File("/Users/vicwintriss/IdeaProjects/NNmaestro20/src/nnmaestro20/CharRecog.csv");
+    private File file = new File("/Users/vicwintriss/IdeaProjects/NNmaestro20/src/nnmaestro20/SevenSegmentCodes.csv");
     public View view;
     private Timer paintTicker;
     private int numberOfInputPEs;//Set automatically by reading first line of input file
@@ -35,31 +34,27 @@ public class Controller
     private ArrayList<PE> inputPElist;
     private ArrayList<PE> hiddenPElist;
     private ArrayList<PE> outputPElist;
+    private HashMap<String, PE> inputPEmap;
+    private HashMap<String, PE> hiddenPEmap;
+    private HashMap<String, PE> outputPEmap;
     private long epochCounter;
     private double rmsError = 1;
     private double learningRate = 0.02;
     private JFileChooser fileChooser;
     private String[][] data;
     private int[][] outputs;
-
+    private int inputPEnumber;
     public static void main(String[] args)
     {
         new Controller().getGoing();
     }
-
     private void getGoing()
     {
-//            fileChooser = new JFileChooser();//For manually selecting input training file
-//            fileChooser.showOpenDialog(null);
-//            inputFile = fileChooser.getSelectedFile();
-//            fileReader = new FileReader(inputFile);
-//            bufferedReader = new BufferedReader(fileReader);
         /***********************************************************************
          * Check to see how many lines in input file and how many items per line
          ***********************************************************************/
         determineLengthOfInputFile();
         determineNumberOfInputAndOutputPEs();
-
         /***********************************************************************
          * Instantiate necessary Classes
          ***********************************************************************/
@@ -69,6 +64,12 @@ public class Controller
         inputPElist = new ArrayList<PE>();
         hiddenPElist = new ArrayList<PE>();
         outputPElist = new ArrayList<PE>();
+        inputPEmap = new HashMap<String, PE>();
+        hiddenPEmap = new HashMap<String, PE>();
+        outputPEmap = new HashMap<String, PE>();
+        //view.setInputPEmap(inputPEmap);
+        //view.setHiddenPEmap(hiddenPEmap);
+        //view.setOutputPEmap(outputPEmap);
         view = new View(version, numberOfInputPEs, numberOfHiddenPEs, numberOfOutputPEs, inputFileLength);
         view.addKeyListener(view);
         view.setInputArray(inputArray);
@@ -189,13 +190,16 @@ public class Controller
         numberOfOutputPEs = outputPEnumber;
     }
 
-    public void initializeInputPEs()
+    public int initializeInputPEs()
     {
         for (int i = 0; i < numberOfInputPEs; i++)//Add input PEs and input circles and populate input value list with dummy values
         {
+            inputPEnumber = i + 1;
             inputPElist.add(new PE());
+            inputPEmap.put(String.valueOf(inputPEnumber), new PE());
             inputPElist.get(i).getInputValueList().add(1.0);//Dummy input...to be replaced by training file read
         }
+        return inputPEnumber;
     }
 
     public int initializeHiddenPEs()
@@ -205,6 +209,7 @@ public class Controller
         {
             hiddenPEnumber = i + 1;
             hiddenPElist.add(new PE());
+            hiddenPEmap.put(String.valueOf(hiddenPEnumber), new PE());
             PE thisHiddenPE = hiddenPElist.get(i);
             for (int j = 0; j < numberOfInputPEs + 1; j++)//+1 to account for bias input
             {

@@ -1,7 +1,7 @@
 package nnmaestro20;
 /**
  * ***************************************************************
- * NNmaestro20 Version220225
+ * NNmaestro20 Version220226
  * No changes from 20.4
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
@@ -14,12 +14,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+
 public class View extends JComponent implements ActionListener, KeyListener
 {
     private int width = (int) (Toolkit.getDefaultToolkit().getScreenSize().width);
@@ -50,6 +53,9 @@ public class View extends JComponent implements ActionListener, KeyListener
     private ArrayList<PE> inputPElist;
     private ArrayList<PE> hiddenPElist;
     private ArrayList<PE> outputPElist;
+    private HashMap<String, PE> inputPEmap;
+    private HashMap<String, PE> hiddenPEmap;
+    private HashMap<String, PE> outputPEmap;
     private ArrayList<Ellipse2D.Double> inputCirclesList = new ArrayList<Ellipse2D.Double>();
     private ArrayList<Ellipse2D.Double> hiddenCirclesList = new ArrayList<Ellipse2D.Double>();
     private ArrayList<Ellipse2D.Double> outputCirclesList = new ArrayList<Ellipse2D.Double>();
@@ -76,6 +82,7 @@ public class View extends JComponent implements ActionListener, KeyListener
     private boolean showTrialViewTable;
     private int[][] inputArray;
     private int[][] outputs;
+    private int inputPeNumber;
     View(String version, int numberOfInputPEs, int numberOfHiddenPEs, final int numberOfOutputPEs, int inputFileLength)
     {
         s.setGroupingSeparator(',');
@@ -160,6 +167,7 @@ public class View extends JComponent implements ActionListener, KeyListener
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D) g;
+        g2.scale(.8, .8);
         g2.setBackground(Color.gray);
         g2.setStroke(new BasicStroke(1f));
         g2.setColor(Color.black);
@@ -169,7 +177,6 @@ public class View extends JComponent implements ActionListener, KeyListener
             g2.drawString("" + (Math.pow(10, -i)), 25, i * height / 4);
         }
         g2.setColor(Color.black);
-        g2.setFont(new Font("Bank Gothic", Font.BOLD, 14));
         String s = String.format("%.4f", rmsError);
         g2.drawString("RMS Error " + s, column1xPos, row2yPos);
         g2.drawString("Epoch " + epochCounter, column1xPos, row1yPos);
@@ -194,9 +201,13 @@ public class View extends JComponent implements ActionListener, KeyListener
             g2.setColor(Color.green);
             g2.fill(thisInputCircle);
             g2.setColor(Color.black);
+            g2.setFont(new Font("Bank Gothic", Font.BOLD, 44));
             g2.draw(thisInputCircle);
-            g2.drawString(inputCirclesList.indexOf(thisInputCircle) + "", (int) thisInputCircle.getCenterX(), (int) thisInputCircle.getCenterY());//draw PE number
-            System.out.println("View192" + inputCirclesList.indexOf(thisInputCircle));
+            inputPeNumber = (int)inputCirclesList.indexOf(thisInputCircle);
+            int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(inputPeNumber));
+            int circleNumberWidthOffset = strWidth/2;
+            g2.drawString(String.valueOf(inputPeNumber), (int) thisInputCircle.getCenterX() - circleNumberWidthOffset, (int) thisInputCircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
+            System.out.println("View202 Input PE number => " + inputPeNumber);
         }
         drawHiddenPEcirclesInputsWeightsAndOutputs(g2);
         drawOutputPEcirclesInputsWeightsAndOutputs(g2);
@@ -207,7 +218,6 @@ public class View extends JComponent implements ActionListener, KeyListener
     {
         for (int i = 0; i < numberOfHiddenPEs; i++)
         {
-            PE thisHiddenPE = hiddenPElist.get(i);
             Ellipse2D.Double thisHiddenPEcircle = hiddenCirclesList.get(i);
             int thisHiddenPEcircleXpos = (int) thisHiddenPEcircle.x;
             int thisHiddenPEcircleYpos = (int) thisHiddenPEcircle.y;
@@ -216,7 +226,10 @@ public class View extends JComponent implements ActionListener, KeyListener
             g2.fill(thisHiddenPEcircle);
             g2.setColor(Color.black);
             g2.draw(thisHiddenPEcircle);
-            g2.drawString(i + "", (int) thisHiddenPEcircle.getCenterX(), (int) thisHiddenPEcircle.getCenterY()); //draw PE number
+            int hiddenPeNumber = (int)hiddenCirclesList.indexOf(thisHiddenPEcircle);
+            int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(hiddenPeNumber));
+            int circleNumberWidthOffset = strWidth/2;
+            g2.drawString(String.valueOf(hiddenPeNumber), (int) thisHiddenPEcircle.getCenterX() - circleNumberWidthOffset, (int) thisHiddenPEcircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
         }
     }
 
@@ -224,7 +237,6 @@ public class View extends JComponent implements ActionListener, KeyListener
     {
         for (int i = 0; i < numberOfOutputPEs; i++)
         {
-            PE thisOutputPE = outputPElist.get(i);
             Ellipse2D.Double thisOutputPEcircle = outputCirclesList.get(i);
             int thisOutputPEcircleXpos = (int) thisOutputPEcircle.x;
             int thisOutputPEcircleYpos = (int) thisOutputPEcircle.y;
@@ -235,11 +247,13 @@ public class View extends JComponent implements ActionListener, KeyListener
             g2.fill(thisOutputPEcircle);
             g2.setColor(Color.black);
             g2.draw(thisOutputPEcircle);
-            g2.drawString(i + "", (int) thisOutputPEcircle.getCenterX(), (int) thisOutputPEcircle.getCenterY()); //draw PE number
+            int outputPeNumber = (int)outputCirclesList.indexOf(thisOutputPEcircle);
+            int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(outputPeNumber));
+            int circleNumberWidthOffset = strWidth/2;
+            g2.drawString(String.valueOf(inputPeNumber), (int) thisOutputPEcircle.getCenterX() - circleNumberWidthOffset, (int) thisOutputPEcircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
             g2.setColor(Color.black);
         }
     }
-
     public void drawRMSerrorGraph(Graphics2D g2)
     {
         /***********************************************
@@ -368,5 +382,17 @@ public class View extends JComponent implements ActionListener, KeyListener
     void modifyData(int i, int j, double d)
     {
         data[i][numberOfInputPEs + j] = Integer.toString((int) Math.round(d));
+    }
+    public void setInputPEmap(HashMap<String, PE> inputPEmap)
+    {
+        this.inputPEmap = inputPEmap;
+    }
+    public void setHiddenPEmap(HashMap<String, PE> hiddenPEmap)
+    {
+        this.hiddenPEmap = hiddenPEmap;
+    }
+    public void setOutputPEmap(HashMap<String, PE> outputPEmap)
+    {
+        this.outputPEmap = outputPEmap;
     }
 }

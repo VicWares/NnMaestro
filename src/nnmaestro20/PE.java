@@ -1,7 +1,7 @@
 package nnmaestro20;
 /**
  * ***************************************************************
- * NNmaestro20 Version220225
+ * NNmaestro20 Version220226
  * No changes from 20.4
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
@@ -11,7 +11,7 @@ package nnmaestro20;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class PE implements Serializable
+public class PE
 {
     private ArrayList<Double> weightValueList;
     private ArrayList<Double> inputValueList;
