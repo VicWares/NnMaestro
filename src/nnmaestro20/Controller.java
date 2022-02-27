@@ -1,24 +1,18 @@
 package nnmaestro20;
-/**
- * ***************************************************************
- * NNmaestro20 Version220226
- * No changes from 20.4
- * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011 
- * All rights reserved 
- *************************************************************************
- */
+ /*************************************************************************
+ * NNmaestro20 Version220227
+ * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
+ * All rights reserved
+ * ************************************************************************/
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
 public class Controller
 {
-    private String version = "220226";
+    private String version = "220227";
     private int inputFileLength;//Set automatically by reading length of input file
     private int inputLineLength;
     private FileReader fileReader;
@@ -34,9 +28,6 @@ public class Controller
     private ArrayList<PE> inputPElist;
     private ArrayList<PE> hiddenPElist;
     private ArrayList<PE> outputPElist;
-    private HashMap<String, PE> inputPEmap;
-    private HashMap<String, PE> hiddenPEmap;
-    private HashMap<String, PE> outputPEmap;
     private long epochCounter;
     private double rmsError = 1;
     private double learningRate = 0.02;
@@ -44,12 +35,14 @@ public class Controller
     private String[][] data;
     private int[][] outputs;
     private int inputPEnumber;
+    public Controller controller;
     public static void main(String[] args)
     {
         new Controller().getGoing();
     }
     private void getGoing()
     {
+        controller = new Controller();
         /***********************************************************************
          * Check to see how many lines in input file and how many items per line
          ***********************************************************************/
@@ -64,12 +57,6 @@ public class Controller
         inputPElist = new ArrayList<PE>();
         hiddenPElist = new ArrayList<PE>();
         outputPElist = new ArrayList<PE>();
-        inputPEmap = new HashMap<String, PE>();
-        hiddenPEmap = new HashMap<String, PE>();
-        outputPEmap = new HashMap<String, PE>();
-        //view.setInputPEmap(inputPEmap);
-        //view.setHiddenPEmap(hiddenPEmap);
-        //view.setOutputPEmap(outputPEmap);
         view = new View(version, numberOfInputPEs, numberOfHiddenPEs, numberOfOutputPEs, inputFileLength);
         view.addKeyListener(view);
         view.setInputArray(inputArray);
@@ -102,7 +89,7 @@ public class Controller
                 double[] outputs = generateOutputLayerOutputsAndErrors();
                 for (int j = 0; j < outputs.length; j++)
                 {
-                    view.modifyData(i,j,outputs[j]);
+                    view.modifyData(i, j, outputs[j]);
                 }
                 backProp();
                 lastRMSErr = computeRMSerror();
@@ -112,7 +99,6 @@ public class Controller
 
         }
     }
-
     public void loadPEsWithTrainingFileData(int i)
     {
         /********************************************************************
@@ -120,14 +106,13 @@ public class Controller
          ********************************************************************/
         for (int k = 0; k < numberOfInputPEs; k++)
         {
-            inputPElist.get(k).getInputValueList().set(0, (double)inputArray[i][k]);
+            inputPElist.get(k).getInputValueList().set(0, (double) inputArray[i][k]);
         }
         for (int k = 0; k < numberOfOutputPEs; k++)
         {
-            outputPElist.get(k).setDesiredTrainingOutputValue((double)inputArray[i][k + numberOfInputPEs]);
+            outputPElist.get(k).setDesiredTrainingOutputValue((double) inputArray[i][k + numberOfInputPEs]);
         }
     }
-
     public int determineLengthOfInputFile()
     {
         String inputLine = "";
@@ -142,13 +127,13 @@ public class Controller
             }
             inputFileLength++;
             fileReader.close();
-        } catch (IOException ex)
+        }
+        catch (IOException ex)
         {
-            System.out.println("hiccup determining input file length at line 155");
+            System.out.println("Controller148 hiccup determining input file length");
         }
         return inputFileLength;
     }
-
     public void determineNumberOfInputAndOutputPEs()//Sets number of hidden PEs to the same as the number of output PEs
     {
         int inputPEnumber = 0;
@@ -173,7 +158,8 @@ public class Controller
                 if ((sChar.equals("0") || sChar.equals("1")) && !breakMarker)//Reading only 0 or 1 inputs
                 {
                     inputPEnumber++;
-                } else
+                }
+                else
                 {
                     if (sChar.equals("0") || sChar.equals("1"))// Reading only 0 or 1 outputs
                     {
@@ -182,26 +168,24 @@ public class Controller
                 }
             }
             fileReader.close();
-        } catch (IOException ex)
+        }
+        catch (IOException ex)
         {
             System.out.println("Hiccup determining Number of Inputs and Outputs at line 188");
         }
         numberOfInputPEs = inputPEnumber;
         numberOfOutputPEs = outputPEnumber;
     }
-
     public int initializeInputPEs()
     {
         for (int i = 0; i < numberOfInputPEs; i++)//Add input PEs and input circles and populate input value list with dummy values
         {
             inputPEnumber = i + 1;
             inputPElist.add(new PE());
-            inputPEmap.put(String.valueOf(inputPEnumber), new PE());
             inputPElist.get(i).getInputValueList().add(1.0);//Dummy input...to be replaced by training file read
         }
         return inputPEnumber;
     }
-
     public int initializeHiddenPEs()
     {
         int hiddenPEnumber = 0;
@@ -209,7 +193,6 @@ public class Controller
         {
             hiddenPEnumber = i + 1;
             hiddenPElist.add(new PE());
-            hiddenPEmap.put(String.valueOf(hiddenPEnumber), new PE());
             PE thisHiddenPE = hiddenPElist.get(i);
             for (int j = 0; j < numberOfInputPEs + 1; j++)//+1 to account for bias input
             {
@@ -219,7 +202,6 @@ public class Controller
         }
         return hiddenPEnumber;
     }
-
     public void initializeOutputPEs()
     {
         for (int i = 0; i < numberOfOutputPEs; i++)//Add output PEs and output circles and create space in output PE input value list and add initial weights
@@ -234,7 +216,6 @@ public class Controller
             }
         }
     }
-
     public void readInputFile()//Puts input file into input array
     {
         String inputLine = "";
@@ -262,12 +243,12 @@ public class Controller
                 lineCount++;
             }
             bufferedReader.close();
-        } catch (IOException ex)
+        }
+        catch (IOException ex)
         {
-            System.out.println("Hiccup at line 286 reading file");
+            System.out.println("Controller266 Hiccup reading file");
         }
     }
-
     private void generateInputLayerOutputs()
     {
         for (int i = 0; i < numberOfInputPEs; i++)//Transfer input straight to PE output value
@@ -276,7 +257,6 @@ public class Controller
             thisInputPE.setOutputValue(thisInputPE.getInputValueList().get(0));
         }
     }
-
     private void populateHiddenLayerInputList()
     {
         PE thisHiddenPE;
@@ -291,7 +271,6 @@ public class Controller
             }
         }
     }
-
     public void generateHiddenLayerOutputs()
     {
         for (int i = 0; i < numberOfHiddenPEs; i++)
@@ -300,7 +279,6 @@ public class Controller
             double output = thisHiddenPE.processInputs();
         }
     }
-
     private void populateOutputLayerInputList()
     {
         for (int i = 0; i < numberOfOutputPEs; i++)
@@ -314,7 +292,6 @@ public class Controller
             }
         }
     }
-
     public double[] generateOutputLayerOutputsAndErrors()
     {
         double[] generatedOutputs = new double[numberOfOutputPEs];
@@ -327,7 +304,6 @@ public class Controller
         }
         return generatedOutputs;
     }
-
     private double computeRMSerror()
     {
         double thisOutputPEerror = 0;
@@ -341,7 +317,6 @@ public class Controller
         rmsError = Math.sqrt(totalError / outputPElist.size());
         return rmsError;
     }
-
     private void backProp()
     {
         /**

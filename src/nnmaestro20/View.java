@@ -1,12 +1,9 @@
 package nnmaestro20;
-/**
- * ***************************************************************
- * NNmaestro20 Version220226
- * No changes from 20.4
+ /************************************************************************
+ * NNmaestro20 Version220227
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
- *************************************************************************
- */
+ *************************************************************************/
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,15 +11,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-
 public class View extends JComponent implements ActionListener, KeyListener
 {
     private int width = (int) (Toolkit.getDefaultToolkit().getScreenSize().width);
@@ -83,8 +77,9 @@ public class View extends JComponent implements ActionListener, KeyListener
     private int[][] inputArray;
     private int[][] outputs;
     private int inputPeNumber;
-    View(String version, int numberOfInputPEs, int numberOfHiddenPEs, final int numberOfOutputPEs, int inputFileLength)
+    public View(String version, int numberOfInputPEs, int numberOfHiddenPEs, final int numberOfOutputPEs, int inputFileLength)
     {
+        this.inputPEmap = inputPEmap;
         s.setGroupingSeparator(',');
         this.inputFileLength = inputFileLength;
         this.numberOfInputPEs = numberOfInputPEs;
@@ -94,8 +89,6 @@ public class View extends JComponent implements ActionListener, KeyListener
         inputArray = new int[inputFileLength][numberOfInputPEs + numberOfOutputPEs];//Each row holds the complete set of inputs and desired outputs
         col = new String[numberOfInputPEs + numberOfOutputPEs];//Set up Headers for trial view table
         data = new String[inputFileLength][numberOfInputPEs + numberOfOutputPEs];//Set up Headers for trial view table
-        rmsErrorPointsList.add(0L);//initial x value for RMS error graph
-        rmsErrorPointsList.add(100L);//initial y value for RMS error graph
         jf = new JFrame("NN Maestro Version " + version);
         jf.add(this);//Add graphics
         jf.setSize(width, height);
@@ -109,7 +102,6 @@ public class View extends JComponent implements ActionListener, KeyListener
         JPanel panel = new JPanel();
         model = new DefaultTableModel(data, col);
         JTable table = new JTable(model);
-        JTableHeader header = table.getTableHeader();
         JScrollPane pane = new JScrollPane(table);
         panel.add(pane);
         frame.add(panel);
@@ -180,17 +172,15 @@ public class View extends JComponent implements ActionListener, KeyListener
         String s = String.format("%.4f", rmsError);
         g2.drawString("RMS Error " + s, column1xPos, row2yPos);
         g2.drawString("Epoch " + epochCounter, column1xPos, row1yPos);
-        g2.setStroke(new BasicStroke(1f));
         for (Line2D.Double peLine : peLineList)//Draw all lines
         {
             g2.setStroke(new BasicStroke(2f));//TODO:make variable depending on value
             g2.draw(peLine);
         } for (Line2D.Double peLine : peInterconnectLineList)//Draw all lines
         {
-            g2.setStroke(new BasicStroke(4f));//TODO:make variable depending on value
+            g2.setStroke(new BasicStroke(2f));//TODO:make variable depending on value
             g2.draw(peLine);
         }
-
         /*************************************************************************************
          * Draw input PE circles and input PE inputs
          *************************************************************************************/
@@ -207,7 +197,6 @@ public class View extends JComponent implements ActionListener, KeyListener
             int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(inputPeNumber));
             int circleNumberWidthOffset = strWidth/2;
             g2.drawString(String.valueOf(inputPeNumber), (int) thisInputCircle.getCenterX() - circleNumberWidthOffset, (int) thisInputCircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
-            System.out.println("View202 Input PE number => " + inputPeNumber);
         }
         drawHiddenPEcirclesInputsWeightsAndOutputs(g2);
         drawOutputPEcirclesInputsWeightsAndOutputs(g2);
@@ -218,39 +207,27 @@ public class View extends JComponent implements ActionListener, KeyListener
     {
         for (int i = 0; i < numberOfHiddenPEs; i++)
         {
-            Ellipse2D.Double thisHiddenPEcircle = hiddenCirclesList.get(i);
-            int thisHiddenPEcircleXpos = (int) thisHiddenPEcircle.x;
-            int thisHiddenPEcircleYpos = (int) thisHiddenPEcircle.y;
-            g2.setStroke(new BasicStroke(5.0f));
-            g2.setColor(Color.green);
-            g2.fill(thisHiddenPEcircle);
-            g2.setColor(Color.black);
-            g2.draw(thisHiddenPEcircle);
-            int hiddenPeNumber = (int)hiddenCirclesList.indexOf(thisHiddenPEcircle);
-            int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(hiddenPeNumber));
-            int circleNumberWidthOffset = strWidth/2;
-            g2.drawString(String.valueOf(hiddenPeNumber), (int) thisHiddenPEcircle.getCenterX() - circleNumberWidthOffset, (int) thisHiddenPEcircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
+            drawCircle(g2, i, hiddenCirclesList);
         }
     }
-
+    private void drawCircle(Graphics2D g2, int i, ArrayList<Ellipse2D.Double> hiddenCirclesList)
+    {
+        Ellipse2D.Double thisHiddenPEcircle = hiddenCirclesList.get(i);
+        g2.setStroke(new BasicStroke(5.0f));
+        g2.setColor(Color.green);
+        g2.fill(thisHiddenPEcircle);
+        g2.setColor(Color.black);
+        g2.draw(thisHiddenPEcircle);
+        int hiddenPeNumber = (int) hiddenCirclesList.indexOf(thisHiddenPEcircle);
+        int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(hiddenPeNumber));
+        int circleNumberWidthOffset = strWidth/2;
+        g2.drawString(String.valueOf(hiddenPeNumber), (int) thisHiddenPEcircle.getCenterX() - circleNumberWidthOffset, (int) thisHiddenPEcircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
+    }
     public void drawOutputPEcirclesInputsWeightsAndOutputs(Graphics2D g2)
     {
         for (int i = 0; i < numberOfOutputPEs; i++)
         {
-            Ellipse2D.Double thisOutputPEcircle = outputCirclesList.get(i);
-            int thisOutputPEcircleXpos = (int) thisOutputPEcircle.x;
-            int thisOutputPEcircleYpos = (int) thisOutputPEcircle.y;
-            float thisOutputPEcircleWidth = (float) thisOutputPEcircle.width;
-            int thisOutputPEcircleCenterY = (int) thisOutputPEcircle.getCenterY();
-            g2.setStroke(new BasicStroke(5.0f));
-            g2.setColor(Color.green);
-            g2.fill(thisOutputPEcircle);
-            g2.setColor(Color.black);
-            g2.draw(thisOutputPEcircle);
-            int outputPeNumber = (int)outputCirclesList.indexOf(thisOutputPEcircle);
-            int strWidth = SwingUtilities.computeStringWidth(g2.getFontMetrics(), String.valueOf(outputPeNumber));
-            int circleNumberWidthOffset = strWidth/2;
-            g2.drawString(String.valueOf(inputPeNumber), (int) thisOutputPEcircle.getCenterX() - circleNumberWidthOffset, (int) thisOutputPEcircle.getCenterY() + circleNumberWidthOffset);//draw PE number in center of circle
+            drawCircle(g2, i, outputCirclesList);
             g2.setColor(Color.black);
         }
     }
@@ -259,7 +236,6 @@ public class View extends JComponent implements ActionListener, KeyListener
         /***********************************************
          * Draw RMS error graph
          ***********************************************/
-        g2.setStroke(new BasicStroke(.0001f));
         graphX = (width * epochCounter / 20000000);
         rmsErrorPointsList.add(graphX);//x position for line
         rmsErrorPointsList.add((long) (height * (-Math.log10(rmsError) / 3.5)));//log y position for line
@@ -270,7 +246,7 @@ public class View extends JComponent implements ActionListener, KeyListener
             long x2 = rmsErrorPointsList.get(i + 2);
             long y2 = rmsErrorPointsList.get(i + 3);
             g2.setColor(Color.blue);
-            g2.setStroke(new BasicStroke(3l));
+            g2.setStroke(new BasicStroke(5l));
             g2.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
         }
     }
@@ -279,32 +255,26 @@ public class View extends JComponent implements ActionListener, KeyListener
     {
         return jf;
     }
-
     public void setRmsError(double rmsError)
     {
         this.rmsError = rmsError;
     }
-
     public void setEpochCounter(long epochCounter)
     {
         this.epochCounter = epochCounter;
     }
-
     public void setPeLineList(ArrayList<Line2D.Double> peLineList)
     {
         this.peLineList = peLineList;
     }
-
     @Override
     public void keyTyped(KeyEvent e)
     {
     }
-
     @Override
     public void keyPressed(KeyEvent e)
     {
     }
-
     @Override
     public void keyReleased(KeyEvent e)
     {
@@ -316,7 +286,6 @@ public class View extends JComponent implements ActionListener, KeyListener
             showTrialViewTable = false;
         }
     }
-
     private void fillTrialTable()
     {
         for (int i = 0; i < inputFileLength; i++) //Set up trial view table from input array
@@ -332,60 +301,46 @@ public class View extends JComponent implements ActionListener, KeyListener
             }
         }
     }
-
     @Override
     public void actionPerformed(ActionEvent ae)
     {
         repaint();
     }
-
     public void setInputPElist(ArrayList<PE> inputPElist)
     {
         this.inputPElist = inputPElist;
     }
-
     public void setHiddenPElist(ArrayList<PE> hiddenPElist)
     {
         this.hiddenPElist = hiddenPElist;
     }
-
     public void setOutputPElist(ArrayList<PE> outputPElist)
     {
         this.outputPElist = outputPElist;
     }
-
     public void setData(String[][] data)
     {
         this.setData(data);
     }
-
     public String[][] getData()
     {
         return data;
     }
-
     public void setInputArray(int[][] inputArray)
     {
         this.inputArray = inputArray;
     }
-
     public void setOutputs(int[][] outputs)
     {
         this.outputs = outputs;
     }
-
     public boolean isShowTrialViewTable()
     {
         return showTrialViewTable;
     }
-
     void modifyData(int i, int j, double d)
     {
         data[i][numberOfInputPEs + j] = Integer.toString((int) Math.round(d));
-    }
-    public void setInputPEmap(HashMap<String, PE> inputPEmap)
-    {
-        this.inputPEmap = inputPEmap;
     }
     public void setHiddenPEmap(HashMap<String, PE> hiddenPEmap)
     {
