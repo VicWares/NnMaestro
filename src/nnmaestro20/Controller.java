@@ -1,6 +1,6 @@
 package nnmaestro20;
- /*************************************************************************
- * NNmaestro20 Version220227
+/*************************************************************************
+ * NNmaestro20 Version220301
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
  * ************************************************************************/
@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 public class Controller
 {
     private String version = "220227";
@@ -36,6 +37,7 @@ public class Controller
     private int[][] outputs;
     private int inputPEnumber;
     public Controller controller;
+    public HashMap<String,String> testMap = new HashMap<>();
     public static void main(String[] args)
     {
         new Controller().getGoing();
@@ -130,7 +132,7 @@ public class Controller
         }
         catch (IOException ex)
         {
-            System.out.println("Controller148 hiccup determining input file length");
+            System.out.println("Copntroller133 hiccup determining input file length");
         }
         return inputFileLength;
     }
@@ -171,7 +173,7 @@ public class Controller
         }
         catch (IOException ex)
         {
-            System.out.println("Hiccup determining Number of Inputs and Outputs at line 188");
+            System.out.println("Controller178 Hiccup determining Number of Inputs and Outputs");
         }
         numberOfInputPEs = inputPEnumber;
         numberOfOutputPEs = outputPEnumber;
@@ -222,11 +224,13 @@ public class Controller
         int value = 0;
         String digit = "";
         int lineCount = 0;
+        ArrayList<String> input = new ArrayList<>();
+        ArrayList<String> output = new ArrayList<>();
         try
         {
             fileReader = new FileReader(file);
             bufferedReader = new BufferedReader(fileReader);
-
+            ArrayList<String> trainingSet = new ArrayList<>();
             while ((inputLine = bufferedReader.readLine()) != null)
             {
                 int charCount = 0;
@@ -246,7 +250,7 @@ public class Controller
         }
         catch (IOException ex)
         {
-            System.out.println("Controller266 Hiccup reading file");
+            System.out.println("Controller254 Hiccup reading file");
         }
     }
     private void generateInputLayerOutputs()
