@@ -1,5 +1,5 @@
 package nnmaestro20;
- /************************************************************************
+/************************************************************************
  * NNmaestro20 Version220301
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
@@ -177,10 +177,10 @@ public class View extends JComponent implements ActionListener, KeyListener
             g2.setStroke(new BasicStroke(2f));//TODO:make variable depending on value
             g2.draw(peLine);
         } for (Line2D.Double peLine : peInterconnectLineList)//Draw all lines
-        {
-            g2.setStroke(new BasicStroke(2f));//TODO:make variable depending on value
-            g2.draw(peLine);
-        }
+    {
+        g2.setStroke(new BasicStroke(2f));//TODO:make variable depending on value
+        g2.draw(peLine);
+    }
         /*************************************************************************************
          * Draw input PE circles and input PE inputs
          *************************************************************************************/
