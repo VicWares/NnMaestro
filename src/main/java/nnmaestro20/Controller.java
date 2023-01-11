@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 public class Controller
 {
-    private String version = "220227";
+    private String version = "230111";
     private int inputFileLength;//Set automatically by reading length of input file
     private int inputLineLength;
     private FileReader fileReader;
     private BufferedReader bufferedReader;
     private int[][] inputArray;
     private BufferedReader input;
-    private File file = new File("/Users/vicwintriss/git/NNmaestro/src/main/java/nnmaestro20/SevenSegmentCodes.csv");
+    private File file = new File("/Users/vicwintriss/Desktop/SevenSegmentCodes.csv");
     public View view;
     private Timer paintTicker;
     private int numberOfInputPEs;//Set automatically by reading first line of input file
