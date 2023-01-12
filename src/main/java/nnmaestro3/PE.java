@@ -1,14 +1,12 @@
-package nnmaestro20;
+package nnmaestro3;
 /**
  * ***************************************************************
- * NNmaestro20 Version220301
- * No changes from 20.4
+ * NnMaestro3 Version230112
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
  *************************************************************************
  */
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class PE

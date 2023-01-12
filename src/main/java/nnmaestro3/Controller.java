@@ -1,6 +1,6 @@
-package nnmaestro20;
+package nnmaestro3;
 /*************************************************************************
- * NNmaestro20 Version220301
+ * NnMaestro3 Version230112
  * Copyright Vic Wintriss, Ryan Kemper, Sean Kemper and Duane DeSieno 2011
  * All rights reserved
  * ************************************************************************/
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 public class Controller
 {
-    private String version = "230111";
+    private String version = "230112";
     private int inputFileLength;//Set automatically by reading length of input file
     private int inputLineLength;
     private FileReader fileReader;
