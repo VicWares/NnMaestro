@@ -20,7 +20,7 @@ public class Controller
     private BufferedReader bufferedReader;
     private int[][] inputArray;
     private BufferedReader input;
-    private File file = new File("/Users/vicwintriss/Desktop/SevenSegmentCodes.csv");
+    private File file = new File("/Users/vicwintriss/git/NnMaestro2/src/main/java/nnmaestro20/SevenSegmentCodes.csv");
     public View view;
     private Timer paintTicker;
     private int numberOfInputPEs;//Set automatically by reading first line of input file
